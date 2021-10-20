@@ -141,7 +141,7 @@ brfss =
 
 
 **Q:** In 2002, which states were observed at 7 or more locations? What about in 2010?
-  ```{r, message=FALSE}
+```{r, message=FALSE}
 brfss %>%
   select(year, locationabbr, locationdesc) %>%
   filter(year == 2002) %>%
@@ -219,12 +219,6 @@ accel_df =
   read.csv("data/accel_data.csv") %>%
   janitor::clean_names() %>%
   mutate(weekday_vs_weekend = ifelse(day %in% c("Saturday","Sunday"), "weekend", "weekday")) %>%   
-  pivot_longer(
-    activity_1:activity_1440,
-    names_to = "minute",
-    names_prefix = "activity_",
-    values_to = "value"
-  ) %>%
   mutate(day = fct_relevel(day, c("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"))) 
 ## description
 skimr::skim(accel_df)
@@ -232,15 +226,15 @@ skimr::skim(accel_df)
 **A:** This dataset has 35 rows and 1444 columns, and weekday_vs_weekend variables is character type, day variables is character type and 1442 variables are numeric type, like week, day_id and activity_*. We can observe from the data that the activity_2 value of the week 1 and day_id==5 is `r accel_df %>% filter(week==1, day_id==5) %>% select(activity_2)`.
 
 
-**Q:** Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
+**Q:** Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals. 
+```{r}
+accel_df %>%
   pivot_longer(
     activity_1:activity_1440,
     names_to = "minute",
     names_prefix = "activity_",
     values_to = "value"
   ) %>%
-  ```{r}
-accel_df %>%
   mutate(minute = as.integer(minute)) %>%
   group_by(week, day_id) %>%
   summarise(total_act = sum(value))%>%
@@ -252,6 +246,12 @@ accel_df %>%
 **Q:** Accelerometer data allows the inspection activity over the course of the day. Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph.
 ```{r}
 accel_df %>%
+  pivot_longer(
+    activity_1:activity_1440,
+    names_to = "minute",
+    names_prefix = "activity_",
+    values_to = "value"
+  ) %>%
   mutate(minute = as.integer(minute)) %>%
   group_by(day_id, day) %>% 
   ggplot(
