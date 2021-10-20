@@ -197,6 +197,7 @@ brfss %>%
   group_by(response) %>%
   ggplot(aes(x = data_value, fill = response)) + 
   geom_density(alpha = .4, adjust = .5, color = "pink") + 
+  scale_x_continuous(limits = c(0,45)) +
   labs(
     title = "Data value distribution plot",
     x = "Data value",
